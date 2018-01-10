@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+    <template id="search_template_date_filter">
+        <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="fa fa-calendar"/>
+            <t t-if="options['date'].get('string') and options['date'].get('filter') != 'custom'"><t t-raw="options['date']['string']"/></t>
+            <t t-if="options['date'].get('filter') == 'custom'">
+                <t t-if="options['date'].get('date')">Date: <span class="js_format_date"><t t-esc="options['date']['date']"/></span></t>    
+                <t t-if="options['date'].get('date_from')">From: <span class="js_format_date"><t t-esc="options['date']['date_from']"/></span> <br/><span class="o_reports_date_to">to: <span class="js_format_date"><t t-esc="options['date']['date_to']"/></span></span></t>    
+            </t>
+            <span class="caret"/>
+        </a>
+        <ul class="dropdown-menu o_filters_menu" role="menu">
+            <li class="js_foldable_trigger o_closed_menu" data-filter='custom_filter_date'><a>Custom</a></li>
+            <li class="o_foldable_menu o_closed_menu" data-filter='custom_filter_date' style='margin-left: 10px; margin-right: 10px;'>
+                <t t-if="options['date'].get('date_from') != None">
+                    <label class="custom-date" for="date_from">Start Date :</label>
+                    <div class="form-group custom-date">
+                        <div class='o_datepicker js_account_reports_datetimepicker' t-att-data-default-value="options['date']['date_from']">
+                            <input type='text' class="o_datepicker_input" name="date_from" />
+                            <span class="o_datepicker_button"/>
+                        </div>
+                    </div>
+                </t>
+                <label class="custom-date" for="date_to" t-if="options['date'].get('date_to') != None">End Date :</label>
+                <label class="custom-date" for="date_to" t-if="options['date'].get('date') != None">Date :</label>
+                <div class="form-group custom-date">
+                    <div class='o_datepicker js_account_reports_datetimepicker' t-att-data-default-value="options['date'].get('date_to') or options['date'].get('date')">
+                        <input type='text' class="o_datepicker_input" name="date_to" />
+                        <span class="o_datepicker_button"/>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary js_account_report_date_filter" data-filter="custom">Apply</button>
+            </li>
+        </ul>
+    </template>
+
+    <template id="search_template_products">
+        <a type="button" class="dropdown-toggle account_analytic_filter" data-toggle="dropdown">
+            <span class="fa fa-folder-open"/> Products
+            <span class="caret"/>
+        </a>
+        <ul class="dropdown-menu o_filters_menu" role="menu">
+            <li style='margin-left: 10px; margin-right: 10px;'>
+                <select class="js_account_reports_analytic_auto_complete" data-filter="product_ids" multiple="multiple" style="min-width: 100px;">
+                    <t t-foreach="product_ids" t-as="a">
+                        <option t-att-value="a[0]"><t t-esc="a[1]" /></option>
+                    </t>
+                </select>
+            </li>
+        </ul>
+    </template>
+
+    <template id="search_template">
+        <div class="btn-group o_dropdown o_account_reports_filter_date" t-if="options.get('date') != None">
+            <t t-call="stock_kardex.search_template_date_filter"/>
+        </div>
+        <div class="btn-group o_dropdown o_account_reports_filter_analytic" t-if="options.get('product') != None">
+            <t t-call="stock_kardex.search_template_products"/>
+        </div>
+    </template>
+
+    </data>
+</odoo>
