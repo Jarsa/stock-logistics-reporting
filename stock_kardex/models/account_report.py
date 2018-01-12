@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import calendar
 import json
 import io
 import logging
@@ -36,6 +37,28 @@ class StockReport(models.AbstractModel):
     filter_unfold_all = None
     filter_hierarchy = None
 
+    @api.model
+    def get_month_start(self):
+        today = datetime.now()
+        month = today.month
+        date_string = "%s-%s-01"
+        if month < 10:
+            date_string = "%s-0%s-01"
+        month_start = date_string % (today.year, month)
+        return month_start
+
+    @api.model
+    def get_month_end(self):
+        today = datetime.now()
+        month = today.month
+        date_string = "%s-%s-%s"
+        if month < 10:
+            date_string = "%s-0%s-%s"
+        month_end = date_string % (
+            today.year, today.month, calendar.monthrange(
+                today.year-1, month)[1])
+        return month_end
+
     def _build_options(self, previous_options=None):
         if not previous_options:
             previous_options = {}
@@ -51,31 +74,9 @@ class StockReport(models.AbstractModel):
 
         options['unfolded_lines'] = []
         for key, value in options.items():
-            if(key in previous_options and value is not None and
-                    previous_options[key] is not None):
-                if key == 'date':
-                    options[key]['filter'] = 'custom'
-                    if previous_options[key].get(
-                            'filter', 'custom') != 'custom':
-                        options[key]['filter'] = previous_options[
-                            key]['filter']
-                    elif (value.get('date_from') is not None and not
-                          previous_options[key].get('date_from')):
-                        company_fiscalyear_dates = (
-                            self.env.user.company_id.compute_fiscalyear_dates(
-                                datetime.strptime(previous_options[key][
-                                    'date'], DEFAULT_SERVER_DATE_FORMAT)))
-                        options[key]['date_from'] = company_fiscalyear_dates[
-                            'date_from'].strftime(DEFAULT_SERVER_DATE_FORMAT)
-                        options[key]['date_to'] = previous_options[key]['date']
-                    elif value.get(
-                            'date') is not None and not previous_options[
-                                key].get('date'):
-                        options[key]['date'] = previous_options[key]['date_to']
-                    else:
-                        options[key] = previous_options[key]
-                else:
-                    options[key] = previous_options[key]
+            if key == 'date':
+                options['date']['date_from'] = self.get_month_start()
+                options['date']['date_to'] = self.get_month_end()
         return options
 
     # TO BE OVERWRITTEN

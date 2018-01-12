@@ -12,7 +12,7 @@ class StockKardexGeneral(models.AbstractModel):
     _description = "General Ledger Report"
     _inherit = "stock.report"
 
-    filter_date = {'date_from': '', 'date_to': '', 'filter': 'this_month'}
+    filter_date = {'date_from': '', 'date_to': '', 'filter': 'custom'}
     filter_product = True
     filter_unfold_all = False
 
