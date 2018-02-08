@@ -16,7 +16,7 @@ var QWeb = core.qweb;
 var _t = core._t;
 
 
-var stockReportsWidget = Widget.extend(ControlPanelMixin, {
+var stockardexReportsWidget = Widget.extend(ControlPanelMixin, {
 
     events: {
         'click .js_stock_report_foldable': 'fold_unfold',
@@ -192,7 +192,7 @@ var stockReportsWidget = Widget.extend(ControlPanelMixin, {
     },
     renderButtons: function() {
         var self = this;
-        this.$buttons = $(QWeb.render("stockReports.buttons", {buttons: this.buttons}));
+        this.$buttons = $(QWeb.render("stockardexReports.buttons", {buttons: this.buttons}));
         // bind actions
         _.each(this.$buttons.siblings('button'), function(el) {
             $(el).click(function() {
@@ -353,6 +353,6 @@ ActionManager.include({
     }
 });
 
-core.action_registry.add('stock_report', stockReportsWidget);
-return stockReportsWidget;
+core.action_registry.add('stock_report', stockardexReportsWidget);
+return stockardexReportsWidget;
 });
