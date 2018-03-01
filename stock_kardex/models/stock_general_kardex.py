@@ -61,9 +61,10 @@ class StockKardexGeneral(models.AbstractModel):
         if not options['date']['date_from'] or not options['date']['date_to']:
             options['date']['date_from'] = self.get_date_start()
             options['date']['date_to'] = self.get_date_end()
+        start_date = options['date']['date_from'] + ' 00:00:01'
+        end_date = options['date']['date_to'] + ' 23:59:59'
         self.env.cr.execute(
-            select, (location_id, location_id, options['date']['date_from'],
-                     options['date']['date_to']))
+            select, (location_id, location_id, start_date, end_date))
         query_data = self.env.cr.dictfetchall()
         for item in query_data:
             product = pp_obj.browse(item['product_id'])
