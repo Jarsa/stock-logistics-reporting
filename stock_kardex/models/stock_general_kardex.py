@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from datetime import timedelta
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
@@ -33,19 +32,22 @@ class StockKardexGeneral(models.AbstractModel):
         uom_obj = self.env['product.uom']
         results = {}
         context = self.env.context
+        tz = self._context.get('tz', 'America/Mexico_City')
         location_id = self.env.user.company_id.location_id.id
         if not location_id:
             raise ValidationError(
                 _("Verify that a main warehouse is"
                   " configured for the report."))
         select = (
-            """SELECT sml.product_id, sml.reference, sml.qty_done, sml.date,
+            """SELECT sml.product_id, sml.reference, sml.qty_done,
+            sml.date AT TIME ZONE 'UTC' AT TIME ZONE %s AS date,
             sml.id, sml.location_id, sml.location_dest_id, sml.state,
             sml.product_uom_id
             FROM stock_move_line sml
             WHERE sml.state = 'done' AND (
                 sml.location_id = %s OR sml.location_dest_id = %s)
-                AND sml.date >= %s AND sml.date <= %s
+                AND sml.date AT TIME ZONE 'UTC' AT TIME ZONE %s >= %s
+                AND sml.date AT TIME ZONE 'UTC' AT TIME ZONE %s <= %s
             """)
         if line_id:
             select += 'AND sml.product_id = %s' % line_id
@@ -64,7 +66,8 @@ class StockKardexGeneral(models.AbstractModel):
         start_date = options['date']['date_from'] + ' 00:00:01'
         end_date = options['date']['date_to'] + ' 23:59:59'
         self.env.cr.execute(
-            select, (location_id, location_id, start_date, end_date))
+            select,
+            (tz, location_id, location_id, tz, start_date, tz, end_date))
         query_data = self.env.cr.dictfetchall()
         for item in query_data:
             product = pp_obj.browse(item['product_id'])
@@ -84,6 +87,22 @@ class StockKardexGeneral(models.AbstractModel):
                 'move_name': item['reference'],
             })
         return results
+
+    @api.model
+    def get_initial_balance(self, product_id, date_from, location_id):
+        moves_out = self.env['stock.move'].read_group(
+            [('product_id', '=', product_id),
+             ('location_id', '=', location_id),
+             ('date', '<=', date_from), ('state', '=', 'done')],
+            ['product_id', 'product_qty'],
+            ['product_id'])
+        moves_in = self.env['stock.move'].read_group(
+            [('product_id', '=', product_id),
+             ('location_dest_id', '=', location_id),
+             ('date', '<=', date_from), ('state', '=', 'done')],
+            ['product_id', 'product_qty'],
+            ['product_id'])
+        return moves_in[0]['product_qty'] - moves_out[0]['product_qty']
 
     @api.model
     def get_lines(self, options, line_id=None):
@@ -108,24 +127,15 @@ class StockKardexGeneral(models.AbstractModel):
             product = product_obj.browse(product_id)
             balance = 0
             date_from_str = options['date']['date_from']
-            stock_date_to = fields.Date.to_string(
-                fields.Date.from_string(date_from_str) -
-                timedelta(days=1))
-            balance = product._compute_quantities_dict(
-                self._context.get('lot_id', False),
-                self._context.get('owner_id', False),
-                self._context.get('package_id', False),
-                self._context.get('from_date', False),
-                stock_date_to)
-            if balance:
-                balance = balance[product_id]['qty_available']
+            balance = self.get_initial_balance(
+                product_id, date_from_str, location)
             lines.append({
                 'id': 'product_%s' % (product_id),
                 'name': product.name,
                 'columns': (
                     [{'name': v} for v in [
                         product.uom_id.name,
-                        sum([x['qty_done'] for x in moves])]]),
+                        sum([x['qty_done'] for x in moves]) + balance]]),
                 'level': 2,
                 'unfoldable': True,
                 'unfolded': 'product_%s' % (
