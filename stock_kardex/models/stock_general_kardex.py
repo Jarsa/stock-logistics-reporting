@@ -90,6 +90,8 @@ class StockKardexGeneral(models.AbstractModel):
 
     @api.model
     def get_initial_balance(self, product_id, date_from, location_id):
+        total_out = 0.0
+        total_in = 0.0
         moves_out = self.env['stock.move'].read_group(
             [('product_id', '=', product_id),
              ('location_id', '=', location_id),
@@ -102,7 +104,11 @@ class StockKardexGeneral(models.AbstractModel):
              ('date', '<=', date_from), ('state', '=', 'done')],
             ['product_id', 'product_qty'],
             ['product_id'])
-        return moves_in[0]['product_qty'] - moves_out[0]['product_qty']
+        if moves_out:
+            total_out = moves_out[0]['product_qty']
+        if moves_in:
+            total_in = moves_in[0]['product_qty']
+        return total_in - total_out
 
     @api.model
     def get_lines(self, options, line_id=None):
