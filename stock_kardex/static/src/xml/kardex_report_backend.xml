@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates>
+    <t t-name="kardexReports.buttons">
+            <button type="button" class='btn btn-primary btn-sm o_account-widget-pdf'>PRINT PREVIEW</button>
+            <button type="button" class='btn btn-primary btn-sm o_account-widget-xls'>EXPORT (XLS)</button>
+    </t>
+    <t t-name="kardexReports.searchView">
+        <div class="o_dropdown o_account_reports_date-filter" t-if="report_type != 'date_range_extended'">
+            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="fa fa-calendar"/> 
+                <t>Date: </t><span t-esc="context.date_from"/> to <span t-esc="context.date_to"/>
+                <span class="caret"/>
+            </a>
+            <ul class="dropdown-menu o_filters_menu" role="menu">
+                <li t-att-class="'o_account_reports_use-custom ' + (context.date_filter == 'custom' and 'o_open_menu' or 'o_closed_menu')" style='margin-left: 10px; margin-right: 10px;'>
+                    <label class="custom-date" for="date_from">Start Date :</label>
+                    <div class="form-group custom-date">
+                        <div class='o_datepicker date o_account_reports_datetimepicker' t-att-data-default-value="context.date_from">
+                            <input type='text' class="o_datepicker_input" name="date_from" />
+                            <span class="o_datepicker_button"/>
+                        </div>
+                    </div>
+                    <label class="custom-date" for="date_to">End Date :</label>
+                    <div class="form-group custom-date">
+                        <div class='o_datepicker date o_account_reports_datetimepicker' t-att-data-default-value="context.date_to">
+                            <input type='text' class="o_datepicker_input" name="date_to" />
+                            <span class="o_datepicker_button"/>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary o_account_reports_one-filter">Apply</button>
+                </li>
+            </ul>
+        </div>
+        <div class="o_dropdown o_account_reports_tags-filter">
+            <a type="button" class="dropdown-toggle" data-toggle="dropdown">
+                <span class="fa fa-folder-open"/>Products: 
+                <t t-if="!context.filter_product_ids.length">
+                    All Products
+                </t>
+                <span class="caret"/>
+            </a>
+            <ul class="dropdown-menu o_filters_menu" role="menu">
+                <li style='margin-left: 10px; margin-right: 10px;'>
+                    <label>Products</label><br />
+                    <div class="form-group">
+                        <select class="o_product_reports_filter_product_auto_complete" multiple="multiple" style="min-width: 500px;">
+                            <t t-foreach="context.available_filter_product_ids" t-as="a">
+                                <option t-att-value="a[0]"><t t-esc="a[1]" /><span> </span><t t-esc="a[2]"/></option>
+                            </t>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary o_account_reports_add_filter_product_tag">Apply</button>
+                </li>
+            </ul>
+        </div>
+    </t>
+</templates>
