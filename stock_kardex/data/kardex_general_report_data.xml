@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_general_stock" model="ir.actions.client">
+        <field name="name">Stock Kardex</field>
+        <field name="tag">general_report_generic</field>
+        <field eval="{'url': '/stock_kardex/output_format/manager_ledger/1', 'model': 'kardex.manager.ledger'}" name="context"/>
+    </record>
+    <menuitem action="action_general_stock" id="menu_action_kardex_general_report" name="Stock Kardex" parent="stock.menu_warehouse_report"/>
+    <template active="True" id="stock_kardex_backend" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script src="/stock_kardex/static/src/js/report_general_stock_widgets.js" type="text/javascript"/>
+            <script src="/stock_kardex/static/src/js/report_general_stock_backend.js" type="text/javascript"/>
+            <link href="/stock_kardex/static/src/less/account_financial_report.less" rel="stylesheet"/>
+        </xpath>
+    </template>
+</odoo>
