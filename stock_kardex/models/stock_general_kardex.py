@@ -140,8 +140,8 @@ class StockKardexGeneral(models.AbstractModel):
                 'name': product.name,
                 'columns': (
                     [{'name': v} for v in [
-                        product.uom_id.name,
-                        sum([x['qty_done'] for x in moves]) + balance]]),
+                        product.uom_id.name, '%.2f' %
+                        (sum([x['qty_done'] for x in moves]) + balance)]]),
                 'level': 2,
                 'unfoldable': True,
                 'unfolded': 'product_%s' % (
@@ -155,7 +155,7 @@ class StockKardexGeneral(models.AbstractModel):
                     'class': 'o_stock_reports_initial_balance',
                     'name': _('Initial Balance'),
                     'parent_id': 'product_%s' % (product_id),
-                    'columns': [{'name': v} for v in [balance]],
+                    'columns': [{'name': v} for v in ['%.2f' % balance]],
                     'level': 4,
                     'colspan': 5,
                 }]
@@ -173,8 +173,8 @@ class StockKardexGeneral(models.AbstractModel):
                             'IN <-- %s' % location_id.name if
                             line['location_dest_id'] == location
                             else 'OUT --> %s' %
-                            location_dest_id.name, line['date'], line[
-                                'qty_done'], '', balance]],
+                            location_dest_id.name, line['date'], '%.2f' % line[
+                                'qty_done'], '', '%.2f' % balance]],
                         'level': 4,
                         'caret_options': 'stock.move.line',
                     }
