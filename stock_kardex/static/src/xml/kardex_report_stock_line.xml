@@ -48,8 +48,8 @@
                         <t t-call="supFootNoteSeqNum" />
                     </t>
                     <ul class="dropdown-menu o_account_reports_domain_dropdown" role="menu" aria-labelledby="dLabel">
-                        <li role="presentation" t-if="l.type == 'move_line_id'"><a role="menuitem" tabindex="-1" t-att-data-active-id="l.id" data-res-model="stock.pack.operation" class="o_account_reports_web_action">View Move</a></li>
-                         <li role="presentation" t-if="l.type == 'move_line_id'"><a role="menuitem" tabindex="-1" t-att-data-active-id="l.move_id" data-res-model="stock.picking" class="o_account_reports_web_action">View Picking</a></li>  
+                        <li role="presentation" t-if="l.type == 'move_line_id'"><a role="menuitem" tabindex="-1" t-att-data-active-id="l.id" data-res-model="stock.move" class="o_account_reports_web_action">View Move</a></li>
+                         <li role="presentation" t-if="l.type == 'move_line_id' and l.move_id"><a role="menuitem" tabindex="-1" t-att-data-active-id="l.move_id" data-res-model="stock.picking" class="o_account_reports_web_action">View Picking</a></li>  
                     </ul>
                 </div>
             </td>

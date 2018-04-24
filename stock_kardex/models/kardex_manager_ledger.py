@@ -40,6 +40,7 @@ class KardexManagerLedger(models.AbstractModel):
     def _do_query(self, line_id=False):
         pp_obj = self.env['product.product']
         uom_obj = self.env['product.uom']
+        sp_obj = self.env['stock.picking']
         results = {}
         context = self.env.context
         tz = self._context.get('tz', 'America/Mexico_City')
@@ -50,27 +51,27 @@ class KardexManagerLedger(models.AbstractModel):
                 _("Verify that a main warehouse is"
                   " configured for the report."))
         select = (
-            """SELECT spo.product_id, sp.name, spo.qty_done, sp.id as picking_id,
-            spo.date AT TIME ZONE 'UTC' AT TIME ZONE %s AS date,
-            spo.id, spo.location_id, spo.location_dest_id, sp.state,
-            spo.product_uom_id
-            FROM stock_pack_operation spo
-            JOIN stock_picking sp ON sp.id = spo.picking_id
-            WHERE sp.state = 'done' AND (
-                spo.location_id = %s OR spo.location_dest_id = %s)
-                AND spo.date AT TIME ZONE 'UTC' AT TIME ZONE %s >= %s
-                AND spo.date AT TIME ZONE 'UTC' AT TIME ZONE %s <= %s
+            """SELECT sm.product_id, sm.name, sm.product_uom_qty,
+            sm.picking_id as picking_id,
+            sm.date AT TIME ZONE 'UTC' AT TIME ZONE %s AS date,
+            sm.id, sm.location_id, sm.location_dest_id, sm.state,
+            sm.product_uom
+            FROM stock_move sm
+            WHERE sm.state = 'done' AND (
+                sm.location_id = %s OR sm.location_dest_id = %s)
+                AND sm.date AT TIME ZONE 'UTC' AT TIME ZONE %s >= %s
+                AND sm.date AT TIME ZONE 'UTC' AT TIME ZONE %s <= %s
             """)
         if line_id:
-            select += 'AND spo.product_id = %s' % line_id
+            select += 'AND sm.product_id = %s' % line_id
         elif filter_product_ids and len(
                 filter_product_ids) > 1:
-            select += 'AND spo.product_id IN %s' % (tuple(
+            select += 'AND sm.product_id IN %s' % (tuple(
                 filter_product_ids), )
         elif filter_product_ids and len(
                 filter_product_ids) == 1:
-            select += 'AND spo.product_id = %s' % filter_product_ids[0]
-        select += ' ORDER BY spo.date'
+            select += 'AND sm.product_id = %s' % filter_product_ids[0]
+        select += ' ORDER BY sm.date'
         if not context['date_from'] or not context['date_to']:
             context = dict(context)
             context['date_from'] = self.get_date_start()
@@ -83,22 +84,24 @@ class KardexManagerLedger(models.AbstractModel):
         query_data = self.env.cr.dictfetchall()
         for item in query_data:
             product = pp_obj.browse(item['product_id'])
-            uom_id = uom_obj.browse(item['product_uom_id'])
-            qty_done = uom_id._compute_quantity(
-                item['qty_done'], product.uom_id)
+            uom_id = uom_obj.browse(item['product_uom'])
+            product_uom_qty = uom_id._compute_quantity(
+                item['product_uom_qty'], product.uom_id)
             if item['product_id'] not in results.keys():
                 results[item['product_id']] = []
             results[item['product_id']].append({
                 'location_id': item['location_id'],
                 'location_dest_id': item['location_dest_id'],
-                'qty_done': (
-                    qty_done if item['location_dest_id'] == location_id
-                    else -qty_done),
+                'product_uom_qty': (
+                    product_uom_qty if item['location_dest_id'] ==
+                    location_id
+                    else -product_uom_qty),
                 'date': item['date'],
                 'move_id': item['id'],
-                'move_name': item['name'],
+                'move_name': (item['name'] if item['picking_id'] is None
+                              else sp_obj.browse(item['picking_id']).name),
                 'picking_id': item['picking_id'],
-                'product_uom': item['product_uom_id'],
+                'product_uom': item['product_uom'],
             })
         return results
 
@@ -167,7 +170,7 @@ class KardexManagerLedger(models.AbstractModel):
                 'name': product.name,
                 'columns': (
                     [product.uom_id.name,
-                     sum([x['qty_done'] for x in moves]) + balance]),
+                     sum([x['product_uom_qty'] for x in moves]) + balance]),
                 'level': 2,
                 'unfoldable': True,
                 'unfolded': (
@@ -193,21 +196,24 @@ class KardexManagerLedger(models.AbstractModel):
                         line['location_id'])
                     location_dest_id = stock_location_obj.browse(
                         line['location_dest_id'])
-                    balance += line['qty_done']
+                    balance += line['product_uom_qty']
                     line_value = {
                         'id': line['move_id'],
                         'type': 'move_line_id',
-                        'move_id': line['picking_id'],
+                        'move_id': (
+                            line['picking_id'] if line['picking_id'] is not
+                            None else False),
                         'name': line['move_name'],
                         'columns': [
                             '', 'IN <-- %s' % location_id.name if
                             line['location_dest_id'] == location
                             else 'OUT --> %s' %
                             location_dest_id.name, line['date'], line[
-                                'qty_done'], product_uom, balance],
+                                'product_uom_qty'], product_uom, balance],
                         'footnotes': {},
                         'level': 1,
                     }
+                    import ipdb; ipdb.set_trace()
                     domain_lines.append(line_value)
                 lines += domain_lines
         return lines
