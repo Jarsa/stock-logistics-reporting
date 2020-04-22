@@ -5,7 +5,7 @@
     "fuzzy": false,
     "jQuery": false,
     "moment": false,
-    "odoo": false,
+    "odoo": true,
     "openerp": false,
     "self": false
   },
