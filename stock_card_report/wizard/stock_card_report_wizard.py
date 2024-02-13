@@ -18,6 +18,9 @@ class StockCardReportWizard(models.TransientModel):
     product_ids = fields.Many2many(
         comodel_name="product.product", string="Products", required=True
     )
+    lot_ids = fields.Many2many(
+        comodel_name="stock.production.lot", string="Lots"
+    )
 
     @api.onchange("date_range_id")
     def _onchange_date_range_id(self):
@@ -55,6 +58,7 @@ class StockCardReportWizard(models.TransientModel):
             "date_to": self.date_to or fields.Date.context_today(self),
             "product_ids": [(6, 0, self.product_ids.ids)],
             "location_id": self.location_id.id,
+            "lot_ids": [(6, 0, self.lot_ids.ids)],
         }
 
     def _export(self, report_type):

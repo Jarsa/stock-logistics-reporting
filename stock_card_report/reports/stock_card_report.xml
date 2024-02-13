@@ -75,6 +75,7 @@
                         </div>
                         <div class="act_as_cell" />
                         <div class="act_as_cell" />
+                        <div class="act_as_cell" />
                         <div class="act_as_cell right">
                             <t t-out="'{0:,.3f}'.format(initial)" />
                         </div>
@@ -103,6 +104,7 @@
                 <div class="act_as_cell">Date From</div>
                 <div class="act_as_cell">Date To</div>
                 <div class="act_as_cell">Location</div>
+                <div class="act_as_cell">Lots</div>
             </div>
             <div class="act_as_row">
                 <div class="act_as_cell">
@@ -114,6 +116,9 @@
                 <div class="act_as_cell">
                     <span t-field="o.location_id" />
                 </div>
+                <div class="act_as_cell">
+                    <span t-field="o.lot_ids" />
+                </div>
             </div>
         </div>
     </template>
@@ -123,6 +128,7 @@
             <div class="act_as_row labels">
                 <div class="act_as_cell">Date</div>
                 <div class="act_as_cell">Reference</div>
+                <div class="act_as_cell">Lot</div>
                 <div class="act_as_cell">In</div>
                 <div class="act_as_cell">Out</div>
                 <div class="act_as_cell">Balance</div>
@@ -137,6 +143,9 @@
             </div>
             <div class="act_as_cell left">
                 <t t-out="product_line.display_name" />
+            </div>
+            <div class="act_as_cell left">
+                <t t-out="product_line.lot_id.name" />
             </div>
             <div class="act_as_cell right">
                 <t t-out="'{0:,.3f}'.format(product_line.product_in)" />

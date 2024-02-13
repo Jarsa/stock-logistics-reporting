@@ -11,9 +11,9 @@ class StockCardView(models.TransientModel):
 
     date = fields.Datetime()
     product_id = fields.Many2one(comodel_name="product.product")
-    product_qty = fields.Float()
+    qty_done = fields.Float()
     product_uom_qty = fields.Float()
-    product_uom = fields.Many2one(comodel_name="uom.uom")
+    product_uom_id = fields.Many2one(comodel_name="uom.uom")
     reference = fields.Char()
     location_id = fields.Many2one(comodel_name="stock.location")
     location_dest_id = fields.Many2one(comodel_name="stock.location")
@@ -21,6 +21,7 @@ class StockCardView(models.TransientModel):
     product_in = fields.Float()
     product_out = fields.Float()
     picking_id = fields.Many2one(comodel_name="stock.picking")
+    lot_id = fields.Many2one(comodel_name="stock.production.lot")
 
     def name_get(self):
         result = []
@@ -41,6 +42,7 @@ class StockCardReport(models.TransientModel):
     date_to = fields.Date()
     product_ids = fields.Many2many(comodel_name="product.product")
     location_id = fields.Many2one(comodel_name="stock.location")
+    lot_ids = fields.Many2many(comodel_name="stock.production.lot")
 
     # Data fields, used to browse report data
     results = fields.Many2many(
@@ -56,21 +58,26 @@ class StockCardReport(models.TransientModel):
         locations = self.env["stock.location"].search(
             [("id", "child_of", [self.location_id.id])]
         )
+        lots = self.lot_ids or self.env["stock.production.lot"].search([
+            ("product_id", "in", self.product_ids.ids),
+        ])
         self._cr.execute(
             """
-            SELECT move.date, move.product_id, move.product_qty,
-                move.product_uom_qty, move.product_uom, move.reference,
+            SELECT move.date, move.product_id, move.qty_done,
+                move.product_uom_qty, move.product_uom_id, move.reference,
                 move.location_id, move.location_dest_id,
                 case when move.location_dest_id in %s
-                    then move.product_qty end as product_in,
+                    then move.qty_done end as product_in,
                 case when move.location_id in %s
-                    then move.product_qty end as product_out,
+                    then move.qty_done end as product_out,
                 case when move.date < %s then True else False end as is_initial,
-                move.picking_id
-            FROM stock_move move
+                move.picking_id,
+                move.lot_id
+            FROM stock_move_line move
             WHERE (move.location_id in %s or move.location_dest_id in %s)
                 and move.state = 'done' and move.product_id in %s
                 and CAST(move.date AS date) <= %s
+                and move.lot_id in %s
             ORDER BY move.date, move.reference
         """,
             (
@@ -81,6 +88,7 @@ class StockCardReport(models.TransientModel):
                 tuple(locations.ids),
                 tuple(self.product_ids.ids),
                 self.date_to,
+                tuple(lots.ids),
             ),
         )
         stock_card_results = self._cr.dictfetchall()

@@ -14,6 +14,7 @@
                     <group>
                         <field name="product_ids" widget="many2many_tags" />
                         <field name="location_id" />
+                        <field name="lot_ids" widget="many2many_tags" domain="[('product_id', 'in', product_ids)]" />
                     </group>
                 </group>
                 <footer>

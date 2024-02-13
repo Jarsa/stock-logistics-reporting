@@ -51,11 +51,18 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                     "format": FORMATS["format_tcell_center"],
                 },
             },
+            "4_lot": {
+                "header": {"value": "Lots"},
+                "data": {
+                    "value": self._render("lot"),
+                    "format": FORMATS["format_tcell_center"],
+                },
+            },
         }
         initial_template = {
             "1_ref": {
                 "data": {"value": "Initial", "format": FORMATS["format_tcell_center"]},
-                "colspan": 4,
+                "colspan": 5,
             },
             "2_balance": {
                 "data": {
@@ -81,17 +88,25 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 },
                 "width": 25,
             },
-            "3_input": {
+            "3_lot": {
+                "header": {"value": "Lot"},
+                "data": {
+                    "value": self._render("lot"),
+                    "format": FORMATS["format_tcell_left"],
+                },
+                "width": 25,
+            },
+            "4_input": {
                 "header": {"value": "In"},
                 "data": {"value": self._render("input")},
                 "width": 25,
             },
-            "4_output": {
+            "5_output": {
                 "header": {"value": "Out"},
                 "data": {"value": self._render("output")},
                 "width": 25,
             },
-            "5_balance": {
+            "6_balance": {
                 "header": {"value": "Balance"},
                 "data": {"value": self._render("balance")},
                 "width": 25,
@@ -139,6 +154,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 "date_from": objects.date_from or "",
                 "date_to": objects.date_to or "",
                 "location": objects.location_id.display_name or "",
+                "lot": ", ".join(objects.lot_ids.mapped("name")) or "",
             },
             col_specs="col_specs_filter",
             wanted_list="wanted_list_filter",
@@ -181,6 +197,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                     "input": line.product_in or 0,
                     "output": line.product_out or 0,
                     "balance": balance,
+                    "lot": line.lot_id.name or "",
                 },
                 default_format=FORMATS["format_tcell_amount_right"],
             )
