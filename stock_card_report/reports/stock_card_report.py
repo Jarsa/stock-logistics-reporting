@@ -77,7 +77,7 @@ class StockCardReport(models.TransientModel):
             WHERE (move.location_id in %s or move.location_dest_id in %s)
                 and move.state = 'done' and move.product_id in %s
                 and CAST(move.date AS date) <= %s
-                and move.lot_id in %s
+                and (move.lot_id IN %s OR move.lot_id IS NULL)
             ORDER BY move.date, move.reference
         """,
             (
@@ -88,7 +88,7 @@ class StockCardReport(models.TransientModel):
                 tuple(locations.ids),
                 tuple(self.product_ids.ids),
                 self.date_to,
-                tuple(lots.ids),
+                tuple(lots.ids) if lots else (0,),
             ),
         )
         stock_card_results = self._cr.dictfetchall()
