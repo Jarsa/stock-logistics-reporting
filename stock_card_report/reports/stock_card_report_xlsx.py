@@ -1,186 +1,117 @@
 # Copyright 2019 Ecosoft Co., Ltd. (http://ecosoft.co.th)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
-import logging
-
-from odoo import models
-
-from odoo.addons.report_xlsx_helper.report.report_xlsx_format import (
-    FORMATS,
-    XLS_HEADERS,
-)
-
-_logger = logging.getLogger(__name__)
+from odoo import api, fields, models
 
 
-class ReportStockCardReportXlsx(models.AbstractModel):
-    _name = "report.stock_card_report.report_stock_card_report_xlsx"
-    _description = "Stock Card Report XLSX"
-    _inherit = "report.report_xlsx.abstract"
+class StockCardView(models.TransientModel):
+    _name = "stock.card.view"
+    _description = "Stock Card View"
+    _order = "date"
 
-    def generate_xlsx_report(self, workbook, data, objects):
-        self._define_formats(workbook)
-        for product in objects.product_ids:
-            for ws_params in self._get_ws_params(workbook, data, product):
-                ws_name = ws_params.get("ws_name")
-                ws_name = self._check_ws_name(ws_name)
-                ws = workbook.add_worksheet(ws_name)
-                generate_ws_method = getattr(self, ws_params["generate_ws_method"])
-                generate_ws_method(workbook, ws, ws_params, data, objects, product)
+    date = fields.Datetime()
+    product_id = fields.Many2one(comodel_name="product.product")
+    product_qty = fields.Float()
+    product_uom_qty = fields.Float()
+    product_uom = fields.Many2one(comodel_name="uom.uom")
+    reference = fields.Char()
+    location_id = fields.Many2one(comodel_name="stock.location")
+    location_dest_id = fields.Many2one(comodel_name="stock.location")
+    is_initial = fields.Boolean()
+    product_in = fields.Float()
+    product_out = fields.Float()
+    picking_id = fields.Many2one(comodel_name="stock.picking")
 
-    def _get_ws_params(self, wb, data, product):
-        filter_template = {
-            "1_date_from": {
-                "header": {"value": "Date from"},
-                "data": {
-                    "value": self._render("date_from"),
-                    "format": FORMATS["format_tcell_date_center"],
-                },
-            },
-            "2_date_to": {
-                "header": {"value": "Date to"},
-                "data": {
-                    "value": self._render("date_to"),
-                    "format": FORMATS["format_tcell_date_center"],
-                },
-            },
-            "3_location": {
-                "header": {"value": "Location"},
-                "data": {
-                    "value": self._render("location"),
-                    "format": FORMATS["format_tcell_center"],
-                },
-            },
-        }
-        initial_template = {
-            "1_ref": {
-                "data": {"value": "Initial", "format": FORMATS["format_tcell_center"]},
-                "colspan": 4,
-            },
-            "2_balance": {
-                "data": {
-                    "value": self._render("balance"),
-                    "format": FORMATS["format_tcell_amount_right"],
-                }
-            },
-        }
-        stock_card_template = {
-            "1_date": {
-                "header": {"value": "Date"},
-                "data": {
-                    "value": self._render("date"),
-                    "format": FORMATS["format_tcell_date_left"],
-                },
-                "width": 25,
-            },
-            "2_reference": {
-                "header": {"value": "Reference"},
-                "data": {
-                    "value": self._render("reference"),
-                    "format": FORMATS["format_tcell_left"],
-                },
-                "width": 25,
-            },
-            "3_input": {
-                "header": {"value": "In"},
-                "data": {"value": self._render("input")},
-                "width": 25,
-            },
-            "4_output": {
-                "header": {"value": "Out"},
-                "data": {"value": self._render("output")},
-                "width": 25,
-            },
-            "5_balance": {
-                "header": {"value": "Balance"},
-                "data": {"value": self._render("balance")},
-                "width": 25,
-            },
-        }
-
-        ws_params = {
-            "ws_name": product.name,
-            "generate_ws_method": "_stock_card_report",
-            "title": f"Stock Card - {product.name}",
-            "wanted_list_filter": [k for k in sorted(filter_template.keys())],
-            "col_specs_filter": filter_template,
-            "wanted_list_initial": [k for k in sorted(initial_template.keys())],
-            "col_specs_initial": initial_template,
-            "wanted_list": [k for k in sorted(stock_card_template.keys())],
-            "col_specs": stock_card_template,
-        }
-        return [ws_params]
-
-    def _stock_card_report(self, wb, ws, ws_params, data, objects, product):
-        ws.set_portrait()
-        ws.fit_to_pages(1, 0)
-        ws.set_header(XLS_HEADERS["xls_headers"]["standard"])
-        ws.set_footer(XLS_HEADERS["xls_footers"]["standard"])
-        self._set_column_width(ws, ws_params)
-        # Title
-        row_pos = 0
-        row_pos = self._write_ws_title(ws, row_pos, ws_params, True)
-        # Filter Table
-        row_pos = self._write_line(
-            ws,
-            row_pos,
-            ws_params,
-            col_specs_section="header",
-            default_format=FORMATS["format_theader_blue_center"],
-            col_specs="col_specs_filter",
-            wanted_list="wanted_list_filter",
-        )
-        row_pos = self._write_line(
-            ws,
-            row_pos,
-            ws_params,
-            col_specs_section="data",
-            render_space={
-                "date_from": objects.date_from or "",
-                "date_to": objects.date_to or "",
-                "location": objects.location_id.display_name or "",
-            },
-            col_specs="col_specs_filter",
-            wanted_list="wanted_list_filter",
-        )
-        row_pos += 1
-        # Stock Card Table
-        row_pos = self._write_line(
-            ws,
-            row_pos,
-            ws_params,
-            col_specs_section="header",
-            default_format=FORMATS["format_theader_blue_center"],
-        )
-        ws.freeze_panes(row_pos, 0)
-        balance = objects._get_initial(
-            objects.results.filtered(lambda l: l.product_id == product and l.is_initial)
-        )
-        row_pos = self._write_line(
-            ws,
-            row_pos,
-            ws_params,
-            col_specs_section="data",
-            render_space={"balance": balance},
-            col_specs="col_specs_initial",
-            wanted_list="wanted_list_initial",
-        )
-        product_lines = objects.results.filtered(
-            lambda l: l.product_id == product and not l.is_initial
-        )
-        for line in product_lines:
-            balance += line.product_in - line.product_out
-            row_pos = self._write_line(
-                ws,
-                row_pos,
-                ws_params,
-                col_specs_section="data",
-                render_space={
-                    "date": line.date or "",
-                    "reference": line.display_name or "",
-                    "input": line.product_in or 0,
-                    "output": line.product_out or 0,
-                    "balance": balance,
-                },
-                default_format=FORMATS["format_tcell_amount_right"],
+    @api.depends("reference", "picking_id.origin")
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = (
+                f"{rec.reference} ({rec.picking_id.origin})"
+                if rec.picking_id.origin
+                else rec.reference
             )
+
+
+class StockCardReport(models.TransientModel):
+    _name = "report.stock.card.report"
+    _description = "Stock Card Report"
+
+    # Filters fields, used for data computation
+    date_from = fields.Date()
+    date_to = fields.Date()
+    product_ids = fields.Many2many(comodel_name="product.product")
+    location_id = fields.Many2one(comodel_name="stock.location")
+
+    # Data fields, used to browse report data
+    results = fields.Many2many(
+        comodel_name="stock.card.view",
+        compute="_compute_results",
+        help="Use compute fields, so there is nothing store in database",
+    )
+
+    def _compute_results(self):
+        self.ensure_one()
+        date_from = self.date_from or "0001-01-01"
+        self.date_to = self.date_to or fields.Date.context_today(self)
+        locations = self.env["stock.location"].search(
+            [("id", "child_of", [self.location_id.id])]
+        )
+        self._cr.execute(
+            """
+            SELECT move.date, move.product_id, move.product_qty,
+                move.product_uom_qty, move.product_uom, move.reference,
+                move.location_id, move.location_dest_id,
+                case when move.location_dest_id in %s
+                    then move.product_qty end as product_in,
+                case when move.location_id in %s
+                    then move.product_qty end as product_out,
+                case when move.date < %s then True else False end as is_initial,
+                move.picking_id
+            FROM stock_move move
+            WHERE (move.location_id in %s or move.location_dest_id in %s)
+                and move.state = 'done' and move.product_id in %s
+                and CAST(move.date AS date) <= %s
+            ORDER BY move.date, move.reference
+        """,
+            (
+                tuple(locations.ids),
+                tuple(locations.ids),
+                date_from,
+                tuple(locations.ids),
+                tuple(locations.ids),
+                tuple(self.product_ids.ids),
+                self.date_to,
+            ),
+        )
+        stock_card_results = self._cr.dictfetchall()
+        ReportLine = self.env["stock.card.view"]
+        self.results = [ReportLine.new(line).id for line in stock_card_results]
+
+    def _get_initial(self, product_line):
+        product_input_qty = sum(product_line.mapped("product_in"))
+        product_output_qty = sum(product_line.mapped("product_out"))
+        return product_input_qty - product_output_qty
+
+    def print_report(self, report_type="qweb"):
+        self.ensure_one()
+        action = (
+            report_type == "xlsx"
+            and self.env.ref("stock_card_report.action_stock_card_report_xlsx")
+            or self.env.ref("stock_card_report.action_stock_card_report_pdf")
+        )
+        return action.report_action(self, config=False)
+
+    def _get_html(self):
+        result = {}
+        rcontext = {}
+        report = self.browse(self._context.get("active_id"))
+        if report:
+            rcontext["o"] = report
+            result["html"] = self.env["ir.qweb"]._render(
+                "stock_card_report.report_stock_card_report_html", rcontext
+            )
+        return result
+
+    @api.model
+    def get_html(self, given_context=None):
+        return self.with_context(**(given_context or {}))._get_html()

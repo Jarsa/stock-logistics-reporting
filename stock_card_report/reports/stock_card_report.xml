@@ -148,6 +148,6 @@
                 <t t-out="'{0:,.3f}'.format(product_balance)" />
             </div>
         </div>
-   </template>
+    </template>
 
 </odoo>
