@@ -3,7 +3,7 @@
 
 import logging
 
-from odoo import models
+from odoo import _, models
 
 from odoo.addons.report_xlsx_helper.report.report_xlsx_format import (
     FORMATS,
@@ -31,21 +31,21 @@ class ReportStockCardReportXlsx(models.AbstractModel):
     def _get_ws_params(self, wb, data, product):
         filter_template = {
             "1_date_from": {
-                "header": {"value": "Date from"},
+                "header": {"value": _("Date From")},
                 "data": {
                     "value": self._render("date_from"),
                     "format": FORMATS["format_tcell_date_center"],
                 },
             },
             "2_date_to": {
-                "header": {"value": "Date to"},
+                "header": {"value": _("Date To")},
                 "data": {
                     "value": self._render("date_to"),
                     "format": FORMATS["format_tcell_date_center"],
                 },
             },
             "3_location": {
-                "header": {"value": "Location"},
+                "header": {"value": _("Location")},
                 "data": {
                     "value": self._render("location"),
                     "format": FORMATS["format_tcell_center"],
@@ -54,7 +54,10 @@ class ReportStockCardReportXlsx(models.AbstractModel):
         }
         initial_template = {
             "1_ref": {
-                "data": {"value": "Initial", "format": FORMATS["format_tcell_center"]},
+                "data": {
+                    "value": _("Initial"),
+                    "format": FORMATS["format_tcell_center"],
+                },
                 "colspan": 4,
             },
             "2_balance": {
@@ -66,7 +69,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
         }
         stock_card_template = {
             "1_date": {
-                "header": {"value": "Date"},
+                "header": {"value": _("Date")},
                 "data": {
                     "value": self._render("date"),
                     "format": FORMATS["format_tcell_date_left"],
@@ -74,7 +77,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 "width": 25,
             },
             "2_reference": {
-                "header": {"value": "Reference"},
+                "header": {"value": _("Reference")},
                 "data": {
                     "value": self._render("reference"),
                     "format": FORMATS["format_tcell_left"],
@@ -82,17 +85,17 @@ class ReportStockCardReportXlsx(models.AbstractModel):
                 "width": 25,
             },
             "3_input": {
-                "header": {"value": "In"},
+                "header": {"value": _("In")},
                 "data": {"value": self._render("input")},
                 "width": 25,
             },
             "4_output": {
-                "header": {"value": "Out"},
+                "header": {"value": _("Out")},
                 "data": {"value": self._render("output")},
                 "width": 25,
             },
             "5_balance": {
-                "header": {"value": "Balance"},
+                "header": {"value": _("Balance")},
                 "data": {"value": self._render("balance")},
                 "width": 25,
             },
@@ -101,7 +104,7 @@ class ReportStockCardReportXlsx(models.AbstractModel):
         ws_params = {
             "ws_name": product.name,
             "generate_ws_method": "_stock_card_report",
-            "title": f"Stock Card - {product.name}",
+            "title": f"{_('Stock Card -')} {product.name}",
             "wanted_list_filter": [k for k in sorted(filter_template.keys())],
             "col_specs_filter": filter_template,
             "wanted_list_initial": [k for k in sorted(initial_template.keys())],
