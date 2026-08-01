@@ -1,0 +1,124 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* stock_card_report_summary
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"Language-Team: none\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+msgid "Date From"
+msgstr "Fecha Desde"
+
+#. module: stock_card_report_summary
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Date From:"
+msgstr "Fecha Desde:"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+msgid "Date To"
+msgstr "Fecha Hasta"
+
+#. module: stock_card_report_summary
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Date To:"
+msgstr "Fecha Hasta:"
+
+#. module: stock_card_report_summary
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.stock_card_report_wizard_form
+msgid "Export Summary PDF"
+msgstr "Exportar resumen PDF"
+
+#. module: stock_card_report_summary
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.stock_card_report_wizard_form
+msgid "Export Summary XLSX"
+msgstr "Exportar resumen XLSX"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Final"
+msgstr "Final"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "In"
+msgstr "Entradas"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Initial"
+msgstr "Inicial"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+msgid "Location"
+msgstr "Ubicación"
+
+#. module: stock_card_report_summary
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Location:"
+msgstr "Ubicación:"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Out"
+msgstr "Salidas"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Product"
+msgstr "Producto"
+
+#. module: stock_card_report_summary
+#: model:ir.actions.report,name:stock_card_report_summary.action_stock_card_report_summary_pdf
+msgid "Stock Card Summary PDF"
+msgstr "Resumen de Kardex PDF"
+
+#. module: stock_card_report_summary
+#: model:ir.actions.report,name:stock_card_report_summary.action_stock_card_report_summary_xlsx
+msgid "Stock Card Summary XLSX"
+msgstr "Resumen de Kardex XLSX"
+
+#. module: stock_card_report_summary
+#. odoo-python
+#: code:addons/stock_card_report_summary/reports/stock_card_report_summary_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report_summary.report_stock_card_report_summary_pdf
+msgid "Stock Card Summary"
+msgstr "Resumen de Kardex"
+
+#. module: stock_card_report_summary
+#: model:ir.model,name:stock_card_report_summary.model_report_stock_card_report
+msgid "Stock Card Report"
+msgstr "Reporte de Kardex"
+
+#. module: stock_card_report_summary
+#: model:ir.model,name:stock_card_report_summary.model_report_stock_card_report_summary_report_summary_xlsx
+msgid "Stock Card Summary XLSX Report"
+msgstr "Reporte XLSX de resumen de Kardex"
+
+#. module: stock_card_report_summary
+#: model:ir.model,name:stock_card_report_summary.model_stock_card_report_wizard
+msgid "Stock Card Report Wizard"
+msgstr "Asistente del Reporte de Kardex"
