@@ -62,12 +62,12 @@ class StockCardReport(models.TransientModel):
             locations = self.location_id
         tz = self.env.user.tz or "UTC"
         self.env["stock.move.line"].flush_model()
-        self._cr.execute(
+        self.env.cr.execute(
             """
             SELECT ml.date AT TIME ZONE 'UTC' AT TIME ZONE %s AS date,
                 ml.product_id, ml.quantity_product_uom AS product_qty,
                 ml.quantity AS product_uom_qty,
-                ml.product_uom_id AS product_uom, ml.reference,
+                ml.product_uom_id AS product_uom, move.reference,
                 ml.location_id, ml.location_dest_id,
                 case when ml.location_dest_id in %s
                     then ml.quantity_product_uom end as product_in,
@@ -77,10 +77,11 @@ class StockCardReport(models.TransientModel):
                     then True else False end as is_initial,
                 ml.picking_id
             FROM stock_move_line ml
+            JOIN stock_move move ON move.id = ml.move_id
             WHERE (ml.location_id in %s or ml.location_dest_id in %s)
                 and ml.state = 'done' and ml.product_id in %s
                 and (ml.date AT TIME ZONE 'UTC' AT TIME ZONE %s)::date <= %s
-            ORDER BY ml.date, ml.reference
+            ORDER BY ml.date, move.reference
         """,
             (
                 tz,
@@ -95,7 +96,7 @@ class StockCardReport(models.TransientModel):
                 self.date_to,
             ),
         )
-        stock_card_results = self._cr.dictfetchall()
+        stock_card_results = self.env.cr.dictfetchall()
         ReportLine = self.env["stock.card.view"]
         self.results = [ReportLine.new(line).id for line in stock_card_results]
 
@@ -116,7 +117,7 @@ class StockCardReport(models.TransientModel):
     def _get_html(self):
         result = {}
         rcontext = {}
-        report = self.browse(self._context.get("active_id"))
+        report = self.browse(self.env.context.get("active_id"))
         if report:
             rcontext["o"] = report
             result["html"] = self.env["ir.qweb"]._render(
