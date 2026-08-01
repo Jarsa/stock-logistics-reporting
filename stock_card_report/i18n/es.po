@@ -119,7 +119,7 @@ msgstr ""
 #. module: stock_card_report
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
 msgid "In"
-msgstr "En"
+msgstr "Entradas"
 
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_report_stock_card_report__include_child_locations
@@ -164,7 +164,7 @@ msgstr "Última Actualización el"
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__location_id
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_filters
 msgid "Location"
-msgstr "Localización"
+msgstr "Ubicación"
 
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__location_dest_id
@@ -174,7 +174,7 @@ msgstr "Ubicación Destino"
 #. module: stock_card_report
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
 msgid "Out"
-msgstr "Fuera"
+msgstr "Salidas"
 
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_report_wizard__date_range_id
@@ -236,7 +236,7 @@ msgstr "Resultados"
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_report_wizard__date_from
 msgid "Start Date"
-msgstr "fecha de inicio"
+msgstr "Fecha de inicio"
 
 #. module: stock_card_report
 #: model:ir.actions.act_window,name:stock_card_report.stock_card_report_action
