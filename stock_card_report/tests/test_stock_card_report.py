@@ -224,6 +224,72 @@ class TestStockCardReport(common.TransactionCase):
         report._compute_results()
         report.get_html(given_context={"active_id": report.id})
 
+    def test_done_qty_differs_from_demand(self):
+        """The report must show done quantities, not the initial demand."""
+        operation_type = self.env.ref("stock.picking_type_in")
+        picking = self.env["stock.picking"].create(
+            {
+                "location_id": self.location_2.id,
+                "location_dest_id": self.location_1.id,
+                "picking_type_id": operation_type.id,
+            }
+        )
+        self.env["stock.move"].create(
+            {
+                "name": self.product_A.name,
+                "product_id": self.product_A.id,
+                "product_uom_qty": 50.000,
+                "product_uom": self.product_A.uom_id.id,
+                "picking_id": picking.id,
+                "location_id": self.location_2.id,
+                "location_dest_id": self.location_1.id,
+            }
+        )
+        picking.action_confirm()
+        # Process more than the demand: the move keeps demand 50 but 60 done
+        picking.move_ids_without_package.quantity = 60.000
+        picking.button_validate()
+        report = self.env["report.stock.card.report"].create(
+            {
+                "product_ids": [(6, 0, [self.product_A.id])],
+                "location_id": self.location_1.id,
+            }
+        )
+        report._compute_results()
+        self.assertEqual(sum(report.results.mapped("product_in")), 110.0)
+
+    def test_include_child_locations(self):
+        """Child locations quantities are optional in the report."""
+        child_location = self.env["stock.location"].create(
+            {"name": "Child Location", "location_id": self.location_1.id}
+        )
+        move = self.env["stock.move"].create(
+            {
+                "name": self.product_B.name,
+                "product_id": self.product_B.id,
+                "product_uom_qty": 10.000,
+                "product_uom": self.product_B.uom_id.id,
+                "location_id": self.location_2.id,
+                "location_dest_id": child_location.id,
+            }
+        )
+        move._action_confirm()
+        move.quantity = 10.000
+        move.picked = True
+        move._action_done()
+        vals = {
+            "product_ids": [(6, 0, [self.product_B.id])],
+            "location_id": self.location_1.id,
+        }
+        report = self.env["report.stock.card.report"].create(vals)
+        report._compute_results()
+        self.assertEqual(sum(report.results.mapped("product_in")), 110.0)
+        report_no_child = self.env["report.stock.card.report"].create(
+            dict(vals, include_child_locations=False)
+        )
+        report_no_child._compute_results()
+        self.assertEqual(sum(report_no_child.results.mapped("product_in")), 100.0)
+
     def test_wizard_date_range(self):
         date_range = self.env["date.range"]
         self.type = self.env["date.range.type"].create(
