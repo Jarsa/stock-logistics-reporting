@@ -2,7 +2,11 @@
 <templates xml:space="preserve">
   <t t-name="report_stock_card_html">
         <t t-call="report_buttons" />
-        <div class="stock_card_reports_page" style="overflow: scroll;height: 100%;" />
+        <div
+            class="stock_card_reports_page"
+            style="overflow: scroll;height: 100%;"
+            t-ref="page"
+        />
     </t>
   <t t-name="report_buttons">
         <div class="button_row">
