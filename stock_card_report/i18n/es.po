@@ -37,6 +37,8 @@ msgid "<span class=\"page\"/>/<span class=\"topage\"/>"
 msgstr "<span class=\"page\"/>/<span class=\"topage\"/>"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
 msgid "Balance"
 msgstr "Saldo"
@@ -61,18 +63,24 @@ msgid "Created on"
 msgstr "Creado el"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__date
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
 msgid "Date"
 msgstr "Fecha"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model:ir.model.fields,field_description:stock_card_report.field_report_stock_card_report__date_from
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_filters
 msgid "Date From"
 msgstr "Fecha Desde"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model:ir.model.fields,field_description:stock_card_report.field_report_stock_card_report__date_to
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_filters
 msgid "Date To"
@@ -108,11 +116,30 @@ msgid "ID"
 msgstr "ID"
 
 #. module: stock_card_report
-#: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
-msgid "In"
-msgstr "En"
+#: model:ir.model.fields,help:stock_card_report.field_stock_card_report_wizard__include_child_locations
+msgid ""
+"If enabled, quantities in child locations of the selected location are "
+"included in the report."
+msgstr ""
+"Si está activo, las cantidades en las ubicaciones hijas de la ubicación "
+"seleccionada se incluyen en el reporte."
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
+#: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
+msgid "In"
+msgstr "Entradas"
+
+#. module: stock_card_report
+#: model:ir.model.fields,field_description:stock_card_report.field_report_stock_card_report__include_child_locations
+#: model:ir.model.fields,field_description:stock_card_report.field_stock_card_report_wizard__include_child_locations
+msgid "Include Child Locations"
+msgstr "Incluir ubicaciones hijas"
+
+#. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_base
 msgid "Initial"
 msgstr "Inicial"
@@ -144,12 +171,14 @@ msgid "Last Updated on"
 msgstr "Última Actualización el"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model:ir.model.fields,field_description:stock_card_report.field_report_stock_card_report__location_id
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_report_wizard__location_id
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__location_id
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_filters
 msgid "Location"
-msgstr "Localización"
+msgstr "Ubicación"
 
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__location_dest_id
@@ -157,9 +186,11 @@ msgid "Location Dest"
 msgstr "Ubicación Destino"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
 msgid "Out"
-msgstr "Fuera"
+msgstr "Salidas"
 
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_report_wizard__date_range_id
@@ -208,6 +239,8 @@ msgid "Products"
 msgstr "Productos"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_view__reference
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_lines_header
 msgid "Reference"
@@ -221,7 +254,7 @@ msgstr "Resultados"
 #. module: stock_card_report
 #: model:ir.model.fields,field_description:stock_card_report.field_stock_card_report_wizard__date_from
 msgid "Start Date"
-msgstr "fecha de inicio"
+msgstr "Fecha de inicio"
 
 #. module: stock_card_report
 #: model:ir.actions.act_window,name:stock_card_report.stock_card_report_action
@@ -230,6 +263,8 @@ msgid "Stock Card"
 msgstr "Tarjeta de Inventario"
 
 #. module: stock_card_report
+#. odoo-python
+#: code:addons/stock_card_report/reports/stock_card_report_xlsx.py:0
 #: model_terms:ir.ui.view,arch_db:stock_card_report.report_stock_card_report_base
 msgid "Stock Card -"
 msgstr "Tarjeta de Inventario -"

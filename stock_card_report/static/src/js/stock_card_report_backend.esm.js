@@ -1,22 +1,24 @@
-/** @odoo-module **/
-
-import {Component, onMounted, onWillStart} from "@odoo/owl";
+import {Component, onMounted, onWillStart, useRef} from "@odoo/owl";
 import {download} from "@web/core/network/download";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 
 export class report_backend extends Component {
-    async start() {
-        $(".stock_card_reports_page").html(this.lines.html);
+    static template = "report_stock_card_html";
+    static props = ["*"];
+
+    start() {
+        this.pageRef.el.innerHTML = this.lines.html;
     }
 
     setup() {
+        this.pageRef = useRef("page");
         onWillStart(async () => {
             this.lines = await this.orm.call("report.stock.card.report", "get_html", [
                 this.context,
             ]);
         });
-        onMounted(async () => {
+        onMounted(() => {
             this.start();
         });
 
@@ -56,5 +58,4 @@ export class report_backend extends Component {
         });
     }
 }
-report_backend.template = "report_stock_card_html";
 registry.category("actions").add("stock_card_report_backend", report_backend);

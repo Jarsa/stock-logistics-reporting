@@ -23,9 +23,9 @@ class TestStockCard(common.TransactionCase):
         self.product_A = self.env["product.product"].create(
             {
                 "name": "Product A",
-                "type": "product",
+                "type": "consu",
+                "is_storable": True,
                 "uom_id": uom_id,
-                "uom_po_id": uom_id,
             }
         )
 
@@ -46,7 +46,6 @@ class TestStockCard(common.TransactionCase):
         )
         self.env["stock.move"].create(
             {
-                "name": self.product_A.name,
                 "product_id": self.product_A.id,
                 "product_uom_qty": 50.000,
                 "product_uom": self.product_A.uom_id.id,
@@ -56,7 +55,7 @@ class TestStockCard(common.TransactionCase):
             }
         )
         picking.action_confirm()
-        picking.move_ids_without_package.quantity = 50.000
+        picking.move_ids.quantity = 50.000
         picking.button_validate()
 
         self.model = self._getReportModel()
@@ -137,17 +136,17 @@ class TestStockCardReport(common.TransactionCase):
         self.product_A = self.env["product.product"].create(
             {
                 "name": "Product A",
-                "type": "product",
+                "type": "consu",
+                "is_storable": True,
                 "uom_id": uom_id,
-                "uom_po_id": uom_id,
             }
         )
         self.product_B = self.env["product.product"].create(
             {
                 "name": "Product B",
-                "type": "product",
+                "type": "consu",
+                "is_storable": True,
                 "uom_id": uom_id,
-                "uom_po_id": uom_id,
             }
         )
 
@@ -168,7 +167,6 @@ class TestStockCardReport(common.TransactionCase):
         )
         self.env["stock.move"].create(
             {
-                "name": self.product_A.name,
                 "product_id": self.product_A.id,
                 "product_uom_qty": 50.000,
                 "product_uom": self.product_A.uom_id.id,
@@ -178,7 +176,7 @@ class TestStockCardReport(common.TransactionCase):
             }
         )
         picking_1.action_confirm()
-        picking_1.move_ids_without_package.quantity = 50.000
+        picking_1.move_ids.quantity = 50.000
         picking_1.button_validate()
 
         picking_2 = self.env["stock.picking"].create(
@@ -190,7 +188,6 @@ class TestStockCardReport(common.TransactionCase):
         )
         self.env["stock.move"].create(
             {
-                "name": self.product_B.name,
                 "product_id": self.product_B.id,
                 "product_uom_qty": 100.000,
                 "product_uom": self.product_B.uom_id.id,
@@ -200,7 +197,7 @@ class TestStockCardReport(common.TransactionCase):
             }
         )
         picking_2.action_confirm()
-        picking_2.move_ids_without_package.quantity = 100.000
+        picking_2.move_ids.quantity = 100.000
         picking_2.button_validate()
 
     def test_reports(self):
@@ -236,7 +233,6 @@ class TestStockCardReport(common.TransactionCase):
         )
         self.env["stock.move"].create(
             {
-                "name": self.product_A.name,
                 "product_id": self.product_A.id,
                 "product_uom_qty": 50.000,
                 "product_uom": self.product_A.uom_id.id,
@@ -247,7 +243,7 @@ class TestStockCardReport(common.TransactionCase):
         )
         picking.action_confirm()
         # Process more than the demand: the move keeps demand 50 but 60 done
-        picking.move_ids_without_package.quantity = 60.000
+        picking.move_ids.quantity = 60.000
         picking.button_validate()
         report = self.env["report.stock.card.report"].create(
             {
@@ -265,7 +261,6 @@ class TestStockCardReport(common.TransactionCase):
         )
         move = self.env["stock.move"].create(
             {
-                "name": self.product_B.name,
                 "product_id": self.product_B.id,
                 "product_uom_qty": 10.000,
                 "product_uom": self.product_B.uom_id.id,
