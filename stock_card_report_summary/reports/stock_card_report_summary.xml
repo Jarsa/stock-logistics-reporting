@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <template id="report_stock_card_report_summary_pdf">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h3>Stock Card Summary</h3>
+                        <div class="row mb-3">
+                            <div class="col-3">
+                                <strong>Date From:</strong>
+                                <span t-field="o.date_from" />
+                            </div>
+                            <div class="col-3">
+                                <strong>Date To:</strong>
+                                <span t-field="o.date_to" />
+                            </div>
+                            <div class="col-6">
+                                <strong>Location:</strong>
+                                <span t-field="o.location_id.complete_name" />
+                            </div>
+                        </div>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-end">Initial</th>
+                                    <th class="text-end">In</th>
+                                    <th class="text-end">Out</th>
+                                    <th class="text-end">Final</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o._get_summary_lines()" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span
+                                                t-out="line['product'].display_name"
+                                            />
+                                        </td>
+                                        <td class="text-end">
+                                            <span
+                                                t-out="line['initial']"
+                                                t-options='{"widget": "float", "precision": 2}'
+                                            />
+                                        </td>
+                                        <td class="text-end">
+                                            <span
+                                                t-out="line['product_in']"
+                                                t-options='{"widget": "float", "precision": 2}'
+                                            />
+                                        </td>
+                                        <td class="text-end">
+                                            <span
+                                                t-out="line['product_out']"
+                                                t-options='{"widget": "float", "precision": 2}'
+                                            />
+                                        </td>
+                                        <td class="text-end">
+                                            <span
+                                                t-out="line['final']"
+                                                t-options='{"widget": "float", "precision": 2}'
+                                            />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_stock_card_report_summary_pdf" model="ir.actions.report">
+        <field name="name">Stock Card Summary PDF</field>
+        <field name="model">report.stock.card.report</field>
+        <field name="report_type">qweb-pdf</field>
+        <field
+            name="report_name"
+        >stock_card_report_summary.report_stock_card_report_summary_pdf</field>
+        <field
+            name="report_file"
+        >stock_card_report_summary.report_stock_card_report_summary_pdf</field>
+        <field name="print_report_name">
+      'Stock Card Summary - [%s]' % (object.location_id.complete_name)
+    </field>
+        <field name="paperformat_id" ref="stock_card_report.paperformat_stock_card" />
+    </record>
+
+    <record id="action_stock_card_report_summary_xlsx" model="ir.actions.report">
+        <field name="name">Stock Card Summary XLSX</field>
+        <field name="model">report.stock.card.report</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">stock_card_report_summary.report_summary_xlsx</field>
+        <field name="report_file">Stock Card Summary</field>
+    </record>
+
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="stock_card_report_wizard_form" model="ir.ui.view">
+        <field name="name">stock.card.report.wizard.form.summary</field>
+        <field name="model">stock.card.report.wizard</field>
+        <field
+            name="inherit_id"
+            ref="stock_card_report.stock_card_report_wizard_form"
+        />
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='button_export_xlsx']" position="after">
+                or
+                <button
+                    name="button_export_summary_pdf"
+                    string="Export Summary PDF"
+                    type="object"
+                />
+                or
+                <button
+                    name="button_export_summary_xlsx"
+                    string="Export Summary XLSX"
+                    type="object"
+                />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
