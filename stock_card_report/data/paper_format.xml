@@ -1,5 +1,4 @@
 <odoo>
-
     <record id="paperformat_stock_card" model="report.paperformat">
         <field name="name">Stock Card A4</field>
         <field name="default" eval="True" />
@@ -15,5 +14,4 @@
         <field name="header_spacing">24</field>
         <field name="dpi">90</field>
     </record>
-
 </odoo>
