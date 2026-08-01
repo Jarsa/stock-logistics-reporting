@@ -41,6 +41,7 @@ class StockCardReport(models.TransientModel):
     date_to = fields.Date()
     product_ids = fields.Many2many(comodel_name="product.product")
     location_id = fields.Many2one(comodel_name="stock.location")
+    include_child_locations = fields.Boolean(default=True)
 
     # Data fields, used to browse report data
     results = fields.Many2many(
@@ -53,33 +54,44 @@ class StockCardReport(models.TransientModel):
         self.ensure_one()
         date_from = self.date_from or "0001-01-01"
         self.date_to = self.date_to or fields.Date.context_today(self)
-        locations = self.env["stock.location"].search(
-            [("id", "child_of", [self.location_id.id])]
-        )
+        if self.include_child_locations:
+            locations = self.env["stock.location"].search(
+                [("id", "child_of", [self.location_id.id])]
+            )
+        else:
+            locations = self.location_id
+        tz = self.env.user.tz or "UTC"
+        self.env["stock.move.line"].flush_model()
         self._cr.execute(
             """
-            SELECT move.date, move.product_id, move.product_qty,
-                move.product_uom_qty, move.product_uom, move.reference,
-                move.location_id, move.location_dest_id,
-                case when move.location_dest_id in %s
-                    then move.product_qty end as product_in,
-                case when move.location_id in %s
-                    then move.product_qty end as product_out,
-                case when move.date < %s then True else False end as is_initial,
-                move.picking_id
-            FROM stock_move move
-            WHERE (move.location_id in %s or move.location_dest_id in %s)
-                and move.state = 'done' and move.product_id in %s
-                and CAST(move.date AS date) <= %s
-            ORDER BY move.date, move.reference
+            SELECT ml.date AT TIME ZONE 'UTC' AT TIME ZONE %s AS date,
+                ml.product_id, ml.quantity_product_uom AS product_qty,
+                ml.quantity AS product_uom_qty,
+                ml.product_uom_id AS product_uom, ml.reference,
+                ml.location_id, ml.location_dest_id,
+                case when ml.location_dest_id in %s
+                    then ml.quantity_product_uom end as product_in,
+                case when ml.location_id in %s
+                    then ml.quantity_product_uom end as product_out,
+                case when (ml.date AT TIME ZONE 'UTC' AT TIME ZONE %s)::date < %s
+                    then True else False end as is_initial,
+                ml.picking_id
+            FROM stock_move_line ml
+            WHERE (ml.location_id in %s or ml.location_dest_id in %s)
+                and ml.state = 'done' and ml.product_id in %s
+                and (ml.date AT TIME ZONE 'UTC' AT TIME ZONE %s)::date <= %s
+            ORDER BY ml.date, ml.reference
         """,
             (
+                tz,
                 tuple(locations.ids),
                 tuple(locations.ids),
+                tz,
                 date_from,
                 tuple(locations.ids),
                 tuple(locations.ids),
                 tuple(self.product_ids.ids),
+                tz,
                 self.date_to,
             ),
         )

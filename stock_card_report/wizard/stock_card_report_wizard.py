@@ -15,6 +15,11 @@ class StockCardReportWizard(models.TransientModel):
     location_id = fields.Many2one(
         comodel_name="stock.location", string="Location", required=True
     )
+    include_child_locations = fields.Boolean(
+        default=True,
+        help="If enabled, quantities in child locations of the selected "
+        "location are included in the report.",
+    )
     product_ids = fields.Many2many(
         comodel_name="product.product", string="Products", required=True
     )
@@ -55,6 +60,7 @@ class StockCardReportWizard(models.TransientModel):
             "date_to": self.date_to or fields.Date.context_today(self),
             "product_ids": [(6, 0, self.product_ids.ids)],
             "location_id": self.location_id.id,
+            "include_child_locations": self.include_child_locations,
         }
 
     def _export(self, report_type):
