@@ -67,7 +67,7 @@ class StockCardReport(models.TransientModel):
             SELECT ml.date AT TIME ZONE 'UTC' AT TIME ZONE %s AS date,
                 ml.product_id, ml.quantity_product_uom AS product_qty,
                 ml.quantity AS product_uom_qty,
-                ml.product_uom_id AS product_uom, move.reference,
+                ml.uom_id AS product_uom, move.reference,
                 ml.location_id, ml.location_dest_id,
                 case when ml.location_dest_id in %s
                     then ml.quantity_product_uom end as product_in,

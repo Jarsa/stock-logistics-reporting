@@ -14,14 +14,14 @@
                 class="o_stock_card_reports_print btn btn-sm oe_button"
                 t-on-click="() => this.onClickPrint()"
             >
-        <span class="fa fa-print" />
+        <i class="oi" data-icon="print" />
         Print
       </button>
             <button
                 class="o_stock_card_reports_export btn btn-sm oe_button"
                 t-on-click="() => this.onClickExport()"
             >
-        <span class="fa fa-download" />
+        <i class="oi" data-icon="download" />
         Export
       </button>
         </div>

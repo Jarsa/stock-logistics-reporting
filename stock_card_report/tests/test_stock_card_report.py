@@ -3,10 +3,9 @@
 
 import logging
 import time
-from datetime import date
 
+from odoo import fields
 from odoo.tests import common, tagged
-from odoo.tools import test_reports
 
 _logger = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class TestStockCard(common.TransactionCase):
             {
                 "product_id": self.product_A.id,
                 "product_uom_qty": 50.000,
-                "product_uom": self.product_A.uom_id.id,
+                "uom_id": self.product_A.uom_id.id,
                 "picking_id": picking.id,
                 "location_id": self.location_2.id,
                 "location_dest_id": self.location_1.id,
@@ -72,31 +71,22 @@ class TestStockCard(common.TransactionCase):
         self.report._compute_results()
 
     def test_html(self):
-        test_reports.try_report(
-            self.env.cr,
-            self.env.uid,
-            self.qweb_report_name,
-            [self.report.id],
-            report_type="qweb-html",
-        )
+        html = self.env["ir.actions.report"]._render_qweb_html(
+            self.qweb_report_name, self.report.ids
+        )[0]
+        self.assertIn(self.product_A.name, html.decode())
 
     def test_qweb(self):
-        test_reports.try_report(
-            self.env.cr,
-            self.env.uid,
-            self.qweb_report_name,
-            [self.report.id],
-            report_type="qweb-pdf",
-        )
+        pdf = self.env["ir.actions.report"]._render_qweb_pdf(
+            self.qweb_report_name, res_ids=self.report.ids
+        )[0]
+        self.assertTrue(pdf)
 
     def test_xlsx(self):
-        test_reports.try_report(
-            self.env.cr,
-            self.env.uid,
-            self.xlsx_report_name,
-            [self.report.id],
-            report_type="xlsx",
+        xlsx = self.env["ir.actions.report"]._render_xlsx(
+            self.xlsx_report_name, self.report.ids, None
         )
+        self.assertEqual(xlsx[1], "xlsx")
 
     def test_print(self):
         self.report.print_report("qweb")
@@ -169,7 +159,7 @@ class TestStockCardReport(common.TransactionCase):
             {
                 "product_id": self.product_A.id,
                 "product_uom_qty": 50.000,
-                "product_uom": self.product_A.uom_id.id,
+                "uom_id": self.product_A.uom_id.id,
                 "picking_id": picking_1.id,
                 "location_id": self.location_2.id,
                 "location_dest_id": self.location_1.id,
@@ -190,7 +180,7 @@ class TestStockCardReport(common.TransactionCase):
             {
                 "product_id": self.product_B.id,
                 "product_uom_qty": 100.000,
-                "product_uom": self.product_B.uom_id.id,
+                "uom_id": self.product_B.uom_id.id,
                 "picking_id": picking_2.id,
                 "location_id": self.location_2.id,
                 "location_dest_id": self.location_1.id,
@@ -235,7 +225,7 @@ class TestStockCardReport(common.TransactionCase):
             {
                 "product_id": self.product_A.id,
                 "product_uom_qty": 50.000,
-                "product_uom": self.product_A.uom_id.id,
+                "uom_id": self.product_A.uom_id.id,
                 "picking_id": picking.id,
                 "location_id": self.location_2.id,
                 "location_dest_id": self.location_1.id,
@@ -263,7 +253,7 @@ class TestStockCardReport(common.TransactionCase):
             {
                 "product_id": self.product_B.id,
                 "product_uom_qty": 10.000,
-                "product_uom": self.product_B.uom_id.id,
+                "uom_id": self.product_B.uom_id.id,
                 "location_id": self.location_2.id,
                 "location_dest_id": child_location.id,
             }
@@ -308,12 +298,9 @@ class TestStockCardReport(common.TransactionCase):
             }
         )
         wizard._onchange_date_range_id()
-        self.assertEqual(
-            wizard.date_from, date(date.today().year, date.today().month, 1)
-        )
-        self.assertEqual(
-            wizard.date_to, date(date.today().year, date.today().month, 28)
-        )
+        today = fields.Date.context_today(wizard)
+        self.assertEqual(wizard.date_from, today.replace(day=1))
+        self.assertEqual(wizard.date_to, today.replace(day=28))
         wizard._export("qweb-pdf")
         wizard.button_export_html()
         wizard.button_export_pdf()
