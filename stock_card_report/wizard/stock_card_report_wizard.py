@@ -12,9 +12,7 @@ class StockCardReportWizard(models.TransientModel):
     date_range_id = fields.Many2one(comodel_name="date.range", string="Period")
     date_from = fields.Date(string="Start Date")
     date_to = fields.Date(string="End Date")
-    location_id = fields.Many2one(
-        comodel_name="stock.location", string="Location", required=True
-    )
+    location_id = fields.Many2one(comodel_name="stock.location", required=True)
     include_child_locations = fields.Boolean(
         default=True,
         help="If enabled, quantities in child locations of the selected "
